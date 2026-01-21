@@ -93,7 +93,7 @@
         <textarea id="fExames" class="form-input" placeholder="Exames"></textarea>
         <textarea id="fMeds" class="form-input" placeholder="Medicações"></textarea>
         <textarea id="fNutri" class="form-input" placeholder="Obs Nutrição"></textarea>
-        <textarea id="fNutro" class="form-input" placeholder="Obs Nutrologia"></textarea>
+        <input type="text" id="fEquipe" class="form-input" placeholder="Equipe">
     </form>
     <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:15px; background:#0284c7; color:white; font-weight:800; border:none; border-radius:8px; margin-top:10px;">SALVAR NA PLANILHA</button>
     <button onclick="fechar()" style="width:100%; padding:12px; border:none; color:var(--text-sub); cursor:pointer;">CANCELAR</button>
@@ -110,7 +110,6 @@
 
     if (localStorage.getItem('ammutro-theme') === 'light') document.body.classList.remove('dark-mode');
 
-    // Função para tratar a data vinda da planilha
     function formatarData(dataRaw) {
         if (!dataRaw || dataRaw === '-') return '-';
         const dataObj = new Date(dataRaw);
@@ -146,7 +145,7 @@
                     <div class="info-block"><span class="label">Exames</span><div class="value">${p.exames || '-'}</div></div>
                     <div class="info-block"><span class="label">Medicações</span><div class="value">${p.medicacoes || '-'}</div></div>
                     <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
-                    <div class="info-block"><span class="label">Obs Nutrologia</span><div class="value">${p.obs_nutro || '-'}</div></div>
+                    <div class="info-block"><span class="label">Equipe</span><div class="value">${p.obs_nutro || p.equipe || '-'}</div></div>
                     <button class="btn-copy" id="btn-cp-${i}" onclick="event.stopPropagation(); copiar(${i})">📋 COPIAR RESUMO</button>
                 </div>
             </div>`).join('');
@@ -167,7 +166,19 @@
     async function salvar() {
         const btn = document.getElementById('btnSalvar');
         btn.innerText = "Enviando..."; btn.disabled = true;
-        const payload = { leito: document.getElementById('fLeito').value, na: document.getElementById('fNA').value, nome: document.getElementById('fNome').value, convenio: document.getElementById('fConvenio').value, hd: document.getElementById('fHD').value, dietoterapia: document.getElementById('fDieta').value, evacuacao: document.getElementById('fEvac').value, exames: document.getElementById('fExames').value, medicacoes: document.getElementById('fMeds').value, obs_nutri: document.getElementById('fNutri').value, obs_nutro: document.getElementById('fNutro').value };
+        const payload = { 
+            leito: document.getElementById('fLeito').value, 
+            na: document.getElementById('fNA').value, 
+            nome: document.getElementById('fNome').value, 
+            convenio: document.getElementById('fConvenio').value, 
+            hd: document.getElementById('fHD').value, 
+            dietoterapia: document.getElementById('fDieta').value, 
+            evacuacao: document.getElementById('fEvac').value, 
+            exames: document.getElementById('fExames').value, 
+            medicacoes: document.getElementById('fMeds').value, 
+            obs_nutri: document.getElementById('fNutri').value, 
+            obs_nutro: document.getElementById('fEquipe').value 
+        };
         try {
             await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             alert("Sucesso!");
@@ -179,7 +190,7 @@
     function copiar(i) {
         const p = dadosLocais[i];
         const evacLida = formatarData(p.evacuacao);
-        const txt = `*RESUMO PACIENTE - AMMUTRO*\n------------------------------\n*LEITO:* ${p.leito || '-'}\n*NA:* ${p.na || '-'}\n*NOME:* ${p.nome || '-'}\n*CONVÊNIO:* ${p.convenio || '-'}\n------------------------------\n*DIAGNÓSTICO:* ${p.hd || '-'}\n*DIETOTERAPIA:* ${p.dietoterapia || '-'}\n*EVACUAÇÃO:* ${evacLida}\n*EXAMES:* ${p.exames || '-'}\n*MEDICAÇÕES:* ${p.medicacoes || '-'}\n------------------------------\n*OBS NUTRIÇÃO:* ${p.obs_nutri || '-'}\n*OBS NUTROLOGIA:* ${p.obs_nutro || '-'}`;
+        const txt = `*RESUMO PACIENTE - AMMUTRO*\n------------------------------\n*LEITO:* ${p.leito || '-'}\n*NA:* ${p.na || '-'}\n*NOME:* ${p.nome || '-'}\n*CONVÊNIO:* ${p.convenio || '-'}\n------------------------------\n*DIAGNÓSTICO:* ${p.hd || '-'}\n*DIETOTERAPIA:* ${p.dietoterapia || '-'}\n*EVACUAÇÃO:* ${evacLida}\n*EXAMES:* ${p.exames || '-'}\n*MEDICAÇÕES:* ${p.medicacoes || '-'}\n------------------------------\n*OBS NUTRIÇÃO:* ${p.obs_nutri || '-'}\n*EQUIPE:* ${p.obs_nutro || p.equipe || '-'}`;
         navigator.clipboard.writeText(txt).then(() => {
             const btn = document.getElementById(`btn-cp-${i}`);
             btn.innerText = "✅ COPIADO!";
