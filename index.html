@@ -44,16 +44,15 @@
         .btn-fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .btn-del { background: none; border: none; color: #f87171; font-size: 1rem; cursor: pointer; padding: 5px; }
 
-        /* REGRAS EXCLUSIVAS PARA O PDF/IMPRESSÃO */
         @media print {
             body { background-color: white !important; color: black !important; }
             .sticky-header, .fab-container, .btn-copy, .voice-btn, .btn-del, .action-btns, #contador { display: none !important; }
             .main-container { width: 100%; max-width: none; margin: 0; padding: 0; }
             .card { border: 1px solid #000 !important; box-shadow: none !important; margin: 10px 0 !important; page-break-inside: avoid; }
-            .card-header { background: #eee !important; color: #000 !important; border-bottom: 1px solid #000 !important; }
+            .card-header { background: #f0f0f0 !important; color: #000 !important; border-bottom: 1px solid #000 !important; }
             .card-body { display: block !important; padding: 5px 10px !important; }
             .info-block { background: #fff !important; border: 1px solid #ddd !important; margin-top: 5px !important; padding: 8px !important; }
-            .label { color: #555 !important; }
+            .label { color: #444 !important; }
             .value { color: #000 !important; font-size: 0.85rem !important; }
         }
     </style>
@@ -90,7 +89,7 @@
         <input type="text" id="fConvenio" class="form-input" placeholder="Convênio">
         <textarea id="fHD" class="form-input" placeholder="Diagnóstico (HD)"></textarea>
         <textarea id="fDieta" class="form-input" placeholder="Dietoterapia"></textarea>
-        <input type="text" id="fEvac" class="form-input" placeholder="Evacuação">
+        <input type="date" id="fEvac" class="form-input" placeholder="Data Evacuação">
         <textarea id="fExames" class="form-input" placeholder="Exames"></textarea>
         <textarea id="fMeds" class="form-input" placeholder="Medicações"></textarea>
         <textarea id="fNutri" class="form-input" placeholder="Obs Nutrição"></textarea>
@@ -110,6 +109,14 @@
     let dadosLocais = [];
 
     if (localStorage.getItem('ammutro-theme') === 'light') document.body.classList.remove('dark-mode');
+
+    // Função para tratar a data vinda da planilha
+    function formatarData(dataRaw) {
+        if (!dataRaw || dataRaw === '-') return '-';
+        const dataObj = new Date(dataRaw);
+        if (isNaN(dataObj.getTime())) return dataRaw;
+        return dataObj.toLocaleDateString('pt-BR');
+    }
 
     async function buscar() {
         document.getElementById('contador').innerText = "Sincronizando...";
@@ -135,7 +142,7 @@
                 <div class="card-body">
                     <div class="info-block"><span class="label">Diagnóstico</span><div class="value">${p.hd || '-'}</div></div>
                     <div class="info-block"><span class="label">Dieta</span><div class="value">${p.dietoterapia || '-'}</div></div>
-                    <div class="info-block"><span class="label">Evacuação</span><div class="value">${p.evacuacao || '-'}</div></div>
+                    <div class="info-block"><span class="label">Evacuação</span><div class="value">${formatarData(p.evacuacao)}</div></div>
                     <div class="info-block"><span class="label">Exames</span><div class="value">${p.exames || '-'}</div></div>
                     <div class="info-block"><span class="label">Medicações</span><div class="value">${p.medicacoes || '-'}</div></div>
                     <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
@@ -171,7 +178,8 @@
 
     function copiar(i) {
         const p = dadosLocais[i];
-        const txt = `*RESUMO PACIENTE - AMMUTRO*\n------------------------------\n*LEITO:* ${p.leito || '-'}\n*NA:* ${p.na || '-'}\n*NOME:* ${p.nome || '-'}\n*CONVÊNIO:* ${p.convenio || '-'}\n------------------------------\n*DIAGNÓSTICO:* ${p.hd || '-'}\n*DIETOTERAPIA:* ${p.dietoterapia || '-'}\n*EVACUAÇÃO:* ${p.evacuacao || '-'}\n*EXAMES:* ${p.exames || '-'}\n*MEDICAÇÕES:* ${p.medicacoes || '-'}\n------------------------------\n*OBS NUTRIÇÃO:* ${p.obs_nutri || '-'}\n*OBS NUTROLOGIA:* ${p.obs_nutro || '-'}`;
+        const evacLida = formatarData(p.evacuacao);
+        const txt = `*RESUMO PACIENTE - AMMUTRO*\n------------------------------\n*LEITO:* ${p.leito || '-'}\n*NA:* ${p.na || '-'}\n*NOME:* ${p.nome || '-'}\n*CONVÊNIO:* ${p.convenio || '-'}\n------------------------------\n*DIAGNÓSTICO:* ${p.hd || '-'}\n*DIETOTERAPIA:* ${p.dietoterapia || '-'}\n*EVACUAÇÃO:* ${evacLida}\n*EXAMES:* ${p.exames || '-'}\n*MEDICAÇÕES:* ${p.medicacoes || '-'}\n------------------------------\n*OBS NUTRIÇÃO:* ${p.obs_nutri || '-'}\n*OBS NUTROLOGIA:* ${p.obs_nutro || '-'}`;
         navigator.clipboard.writeText(txt).then(() => {
             const btn = document.getElementById(`btn-cp-${i}`);
             btn.innerText = "✅ COPIADO!";
@@ -221,8 +229,7 @@
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        localStorage.setItem('ammutro-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('ammutro-theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
     buscar();
 </script>
