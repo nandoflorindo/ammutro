@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mapa AMMUTRO</title>
+    <style>
+        :root {
+            /* PALETA MONOCROMÁTICA PROFISSIONAL */
+            --hosp-navy: #0f172a;
+            --hosp-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --block-bg: #f1f5f9; /* Tom único para todos os blocos */
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --accent: #334155;
+        }
+
+        body.dark-mode {
+            --hosp-bg: #020617;
+            --card-bg: #0f172a;
+            --border-color: #1e293b;
+            --block-bg: #1e293b; /* Tom único escuro */
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --accent: #38bdf8;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--hosp-bg); 
+            margin: 0; padding: 0; color: var(--text-main); 
+            transition: all 0.2s ease;
+        }
+
+        .main-container { width: 95%; max-width: 500px; margin: 0 auto; padding-bottom: 90px; }
+
+        /* Header e Busca */
+        .sticky-header {
+            position: sticky; top: 0; background: var(--hosp-bg); z-index: 1000;
+            padding: 15px 0 10px 0; border-bottom: 2px solid var(--hosp-navy);
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px; }
+        .header h2 { margin: 0; font-size: 0.95rem; color: var(--hosp-navy); text-transform: uppercase; font-weight: 800; }
+        body.dark-mode .header h2 { color: var(--text-main); }
+
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 5px; }
+        .search-field label { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; text-align: center; display: block;}
+        
+        .search-field input {
+            padding: 10px 5px; border-radius: 4px; border: 1px solid var(--border-color);
+            font-size: 0.85rem; outline: none; text-align: center; width: 100%;
+            background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
+        }
+
+        .filter-controls { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px 0 5px; }
+        #contador { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); }
+        #btnClear { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer;}
+
+        /* Cards Monocromáticos */
+        .card {
+            background: var(--card-bg); border-radius: 8px; margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--hosp-navy); color: white; padding: 8px 15px;
+            display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold;
+        }
+
+        .info-block { 
+            padding: 12px 15px; 
+            margin: 8px; 
+            border-radius: 4px;
+            background: var(--block-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-sub); font-weight: 800; margin-bottom: 4px; display: block; }
+        .value { font-size: 0.92rem; font-weight: 600; line-height: 1.4; white-space: pre-wrap; }
+        .name-value { font-size: 1.1rem; color: var(--text-main); margin-bottom: 2px; }
+        .conv-value { font-size: 0.8rem; color: var(--text-sub); font-weight: 700; }
+
+        .list-item { display: block; padding: 3px 0; border-bottom: 1px solid var(--border-color); }
+        .list-item:last-child { border-bottom: none; }
+
+        .refresh-btn {
+            position: fixed; bottom: 25px; right: 25px;
+            background: var(--hosp-navy); color: white; border: none;
+            width: 55px; height: 55px; border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;
+            display: flex; align-items: center; justify-content: center; z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="sticky-header">
+            <div class="header">
+                <h2>Mapa AMMUTRO</h2>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span id="status">...</span>
+                    <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
+                </div>
+            </div>
+            
+            <div class="search-grid">
+                <div class="search-field"><label>Leito</label><input type="text" id="searchLeito" onkeyup="filtrarCards()"></div>
+                <div class="search-field"><label>Paciente</label><input type="text" id="searchNome" onkeyup="filtrarCards()"></div>
+                <div class="search-field"><label>NA</label><input type="text" id="searchNA" onkeyup="filtrarCards()"></div>
+            </div>
+
+            <div class="filter-controls">
+                <span id="contador">Carregando...</span>
+                <button id="btnClear" onclick="limparFiltros()">Limpar</button>
+            </div>
+        </div>
+
+        <div id="app"></div>
+    </div>
+
+    <button class="refresh-btn" onclick="buscarDados()">↻</button>
+
+    <script>
+        const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzRGl7J1UBvc42te3JbkKMTg4QEhPt4UY9f7UuqEIL4Zk9ajUlUufpi2maQV4qJABPv/exec';
+        let dadosLocais = [];
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme-ammutro', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('theme-ammutro') === 'dark') document.body.classList.add('dark-mode');
+
+        function limparFiltros() {
+            document.getElementById('searchLeito').value = "";
+            document.getElementById('searchNome').value = "";
+            document.getElementById('searchNA').value = "";
+            filtrarCards();
+        }
+
+        function formatarLista(texto) {
+            if (!texto || texto === '-' || texto === '') return '-';
+            const partes = texto.toString().split(/[\n,]+/);
+            return partes.length > 1 ? partes.map(item => `<span class="list-item">• ${item.trim()}</span>`).join('') : texto;
+        }
+
+        async function buscarDados() {
+            const statusEl = document.getElementById('status');
+            statusEl.innerText = '...';
+            try {
+                const res = await fetch(URL_SCRIPT);
+                dadosLocais = await res.json();
+                renderizar(dadosLocais);
+                statusEl.innerText = 'Atu: ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            } catch (err) { statusEl.innerText = 'ERRO'; }
+        }
+
+        function filtrarCards() {
+            const lB = document.getElementById('searchLeito').value.trim().toLowerCase();
+            const nB = document.getElementById('searchNome').value.trim().toLowerCase();
+            const naB = document.getElementById('searchNA').value.trim().toLowerCase();
+            const cards = document.getElementsByClassName('card');
+            let count = 0;
+            for (let card of cards) {
+                const matchL = lB === "" || card.getAttribute('data-leito').toLowerCase().startsWith(lB);
+                const matchN = nB === "" || card.getAttribute('data-nome').toLowerCase().includes(nB);
+                const matchNA = naB === "" || card.getAttribute('data-na').toLowerCase().includes(naB);
+                if (matchL && matchN && matchNA) { card.style.display = "block"; count++; }
+                else { card.style.display = "none"; }
+            }
+            document.getElementById('contador').innerText = `${count} pacientes encontrados`;
+        }
+
+        function renderizar(pacientes) {
+            const app = document.getElementById('app');
+            app.innerHTML = pacientes.map(p => `
+                <div class="card" data-leito="${p.leito}" data-nome="${p.nome}" data-na="${p.na}">
+                    <div class="card-header">
+                        <span>LEITO: ${p.leito || '--'}</span>
+                        <span>NA: ${p.na || '--'}</span>
+                    </div>
+                    
+                    <div class="info-block" style="background:var(--card-bg)">
+                        <div class="value name-value">Nome: ${p.nome || '-'}</div>
+                        <div class="conv-value">Convênio: ${p.convenio || '-'}</div>
+                    </div>
+
+                    <div class="info-block"><span class="label">Diagnóstico (HD)</span><div class="value">${formatarLista(p.hd)}</div></div>
+                    <div class="info-block"><span class="label">Dietoterapia</span><div class="value">${formatarLista(p.dietoterapia)}</div></div>
+                    <div class="info-block"><span class="label">Evacuação</span><div class="value">${p.evacuacao || '-'}</div></div>
+                    <div class="info-block"><span class="label">Exames</span><div class="value">${formatarLista(p.exames)}</div></div>
+                    <div class="info-block"><span class="label">Medicações</span><div class="value">${formatarLista(p.medicacoes)}</div></div>
+                    <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
+                    <div class="info-block"><span class="label">Obs Nutrologia</span><div class="value">${p.obs_nutro || '-'}</div></div>
+                </div>
+            `).join('');
+            filtrarCards();
+        }
+
+        buscarDados();
+        setInterval(buscarDados, 60000);
+    </script>
+</body>
+</html>
