@@ -3,28 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mapa AMMUTRO</title>
+    <title>Mapa pacientes AMMUTRO</title>
     <style>
         :root {
-            /* PALETA MONOCROMÁTICA PROFISSIONAL */
             --hosp-navy: #0f172a;
             --hosp-bg: #f8fafc;
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
-            --block-bg: #f1f5f9; /* Tom único para todos os blocos */
+            --block-bg: #f1f5f9; 
             --text-main: #1e293b;
             --text-sub: #64748b;
-            --accent: #334155;
         }
 
         body.dark-mode {
             --hosp-bg: #020617;
             --card-bg: #0f172a;
             --border-color: #1e293b;
-            --block-bg: #1e293b; /* Tom único escuro */
+            --block-bg: #1e293b;
             --text-main: #f1f5f9;
             --text-sub: #94a3b8;
-            --accent: #38bdf8;
         }
         
         body { 
@@ -36,7 +33,7 @@
 
         .main-container { width: 95%; max-width: 500px; margin: 0 auto; padding-bottom: 90px; }
 
-        /* Header e Busca */
+        /* HEADER E BUSCA */
         .sticky-header {
             position: sticky; top: 0; background: var(--hosp-bg); z-index: 1000;
             padding: 15px 0 10px 0; border-bottom: 2px solid var(--hosp-navy);
@@ -46,20 +43,27 @@
         .header h2 { margin: 0; font-size: 0.95rem; color: var(--hosp-navy); text-transform: uppercase; font-weight: 800; }
         body.dark-mode .header h2 { color: var(--text-main); }
 
+        .header-info { display: flex; align-items: center; gap: 10px; }
+        #status { font-size: 0.65rem; color: var(--text-sub); font-weight: 600; }
+
         .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 5px; }
+        .search-field { position: relative; }
         .search-field label { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; text-align: center; display: block;}
-        
         .search-field input {
             padding: 10px 5px; border-radius: 4px; border: 1px solid var(--border-color);
             font-size: 0.85rem; outline: none; text-align: center; width: 100%;
             background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
         }
 
+        .voice-btn { position: absolute; right: 5px; bottom: 8px; background: none; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0.5; }
+
         .filter-controls { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px 0 5px; }
         #contador { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); }
-        #btnClear { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer;}
+        
+        .action-btns { display: flex; gap: 8px; }
+        .btn-small { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer;}
 
-        /* Cards Monocromáticos */
+        /* CARDS */
         .card {
             background: var(--card-bg); border-radius: 8px; margin: 20px 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-color);
@@ -72,11 +76,8 @@
         }
 
         .info-block { 
-            padding: 12px 15px; 
-            margin: 8px; 
-            border-radius: 4px;
-            background: var(--block-bg);
-            border: 1px solid var(--border-color);
+            padding: 12px 15px; margin: 8px; border-radius: 4px;
+            background: var(--block-bg); border: 1px solid var(--border-color);
         }
 
         .label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-sub); font-weight: 800; margin-bottom: 4px; display: block; }
@@ -94,6 +95,17 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;
             display: flex; align-items: center; justify-content: center; z-index: 1001;
         }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .sticky-header, .refresh-btn, #themeToggle, .action-btns, .voice-btn { display: none !important; }
+            .main-container { width: 100%; max-width: 100%; margin: 0; padding: 0; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin: 10px 0 !important; }
+            .card-header { background: #eee !important; color: black !important; border-bottom: 1px solid #ccc !important; }
+            .info-block { background: #fafafa !important; border: 1px solid #eee !important; margin: 5px !important; padding: 8px !important; }
+            .name-value { color: black !important; }
+            .conv-value { color: #555 !important; }
+        }
     </style>
 </head>
 <body>
@@ -101,22 +113,36 @@
     <div class="main-container">
         <div class="sticky-header">
             <div class="header">
-                <h2>Mapa AMMUTRO</h2>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span id="status">...</span>
-                    <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
+                <h2>Mapa pacientes AMMUTRO</h2>
+                <div class="header-info">
+                    <span id="status">Sincronizando...</span>
+                    <button id="themeToggle" onclick="toggleTheme()" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
                 </div>
             </div>
             
             <div class="search-grid">
-                <div class="search-field"><label>Leito</label><input type="text" id="searchLeito" onkeyup="filtrarCards()"></div>
-                <div class="search-field"><label>Paciente</label><input type="text" id="searchNome" onkeyup="filtrarCards()"></div>
-                <div class="search-field"><label>NA</label><input type="text" id="searchNA" onkeyup="filtrarCards()"></div>
+                <div class="search-field">
+                    <label>Leito</label>
+                    <input type="text" id="searchLeito" placeholder="Nº" onkeyup="filtrarCards()">
+                    <button class="voice-btn" onclick="startVoice('searchLeito')">🎤</button>
+                </div>
+                <div class="search-field">
+                    <label>Paciente</label>
+                    <input type="text" id="searchNome" placeholder="Nome" onkeyup="filtrarCards()">
+                    <button class="voice-btn" onclick="startVoice('searchNome')">🎤</button>
+                </div>
+                <div class="search-field">
+                    <label>NA</label>
+                    <input type="text" id="searchNA" placeholder="ID" onkeyup="filtrarCards()">
+                </div>
             </div>
 
             <div class="filter-controls">
-                <span id="contador">Carregando...</span>
-                <button id="btnClear" onclick="limparFiltros()">Limpar</button>
+                <span id="contador">Atualizando...</span>
+                <div class="action-btns">
+                    <button class="btn-small" onclick="window.print()">🖨️ PDF</button>
+                    <button class="btn-small" onclick="limparFiltros()">Limpar</button>
+                </div>
             </div>
         </div>
 
@@ -128,6 +154,47 @@
     <script>
         const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzRGl7J1UBvc42te3JbkKMTg4QEhPt4UY9f7UuqEIL4Zk9ajUlUufpi2maQV4qJABPv/exec';
         let dadosLocais = [];
+
+        function startVoice(fieldId) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                alert("Este navegador não suporta reconhecimento de voz ou o site não está em ambiente seguro (HTTPS).");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            const btn = event.currentTarget;
+            btn.innerText = "🔴";
+
+            recognition.onresult = (event) => {
+                let result = event.results[0][0].transcript;
+                let text = result.replace(/\./g, "").trim();
+
+                if(fieldId === 'searchLeito') {
+                    // Tenta converter "dez" em "10", etc, e remove o que não for número
+                    text = text.replace(/\D/g, "");
+                }
+
+                document.getElementById(fieldId).value = text;
+                filtrarCards();
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Erro voz:", event.error);
+                if(event.error === 'not-allowed') alert("Permissão de microfone negada. Verifique o cadeado na barra de endereços.");
+            };
+
+            recognition.onend = () => {
+                btn.innerText = "🎤";
+            };
+
+            recognition.start();
+        }
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -150,13 +217,13 @@
 
         async function buscarDados() {
             const statusEl = document.getElementById('status');
-            statusEl.innerText = '...';
+            statusEl.innerText = 'Sincronizando...';
             try {
                 const res = await fetch(URL_SCRIPT);
                 dadosLocais = await res.json();
                 renderizar(dadosLocais);
-                statusEl.innerText = 'Atu: ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            } catch (err) { statusEl.innerText = 'ERRO'; }
+                statusEl.innerText = 'Última atualização: ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            } catch (err) { statusEl.innerText = 'Erro de conexão'; }
         }
 
         function filtrarCards() {
