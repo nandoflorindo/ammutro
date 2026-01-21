@@ -7,272 +7,206 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --hosp-navy: #0f172a;
-            --hosp-bg: #f8fafc;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --block-bg: #f1f5f9; 
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --skeleton-bg: #e2e8f0;
-            --skeleton-highlight: #f8fafc;
+            --hosp-navy: #0f172a; --hosp-bg: #f8fafc; --card-bg: #ffffff;
+            --border-color: #e2e8f0; --block-bg: #f1f5f9; 
+            --text-main: #1e293b; --text-sub: #64748b;
         }
-
         body.dark-mode {
-            --hosp-bg: #020617;
-            --card-bg: #0f172a;
-            --border-color: #1e293b;
-            --block-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --skeleton-bg: #1e293b;
-            --skeleton-highlight: #0f172a;
+            --hosp-bg: #020617; --card-bg: #0f172a; --border-color: #1e293b;
+            --block-bg: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8;
         }
-        
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--hosp-bg); 
-            margin: 0; padding: 0; color: var(--text-main); 
-            transition: background 0.3s ease;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .main-container { width: 92%; max-width: 480px; margin: 0 auto; padding-bottom: 100px; }
-
-        .sticky-header {
-            position: sticky; top: 0; background: var(--hosp-bg); z-index: 1000;
-            padding: 12px 0; border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(8px);
-        }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
-        .header h2 { margin: 0; font-size: 0.9rem; color: var(--hosp-navy); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--hosp-bg); margin: 0; padding: 0; color: var(--text-main); -webkit-font-smoothing: antialiased; }
+        .main-container { width: 95%; max-width: 500px; margin: 0 auto; padding-bottom: 120px; }
+        .sticky-header { position: sticky; top: 0; background: var(--hosp-bg); z-index: 1000; padding: 15px 0 10px 0; border-bottom: 2px solid var(--hosp-navy); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px; }
+        .header h2 { margin: 0; font-size: 0.9rem; text-transform: uppercase; font-weight: 800; color: var(--hosp-navy); }
         body.dark-mode .header h2 { color: #fff; }
-
-        .header-info { display: flex; align-items: center; gap: 12px; }
-        #status { font-size: 0.65rem; color: var(--text-sub); font-weight: 600; }
-
-        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 5px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 5px; }
         .search-field { position: relative; }
-        .search-field label { font-size: 0.55rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; letter-spacing: 0.3px;}
-        .search-field input {
-            padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
-            font-size: 0.8rem; outline: none; text-align: center; width: 100%;
-            background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-        .search-field input:focus { border-color: var(--text-sub); }
-
-        .voice-btn { position: absolute; right: 5px; bottom: 8px; background: none; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0.4; }
-
-        .filter-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px 0 5px; }
-        #contador { font-size: 0.65rem; font-weight: 600; color: var(--text-sub); }
-        
-        .action-btns { display: flex; gap: 10px; }
-        .btn-small { background: none; border: 1px solid var(--border-color); color: var(--text-sub); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 5px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-        .btn-small:hover { background: var(--block-bg); }
-
-        /* CARDS REFINADOS */
-        .card {
-            background: var(--card-bg); border-radius: 12px; margin: 16px 0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-            border: 1px solid var(--border-color);
-            overflow: hidden; cursor: pointer;
-        }
-
-        .card-header {
-            background: var(--hosp-navy); color: rgba(255,255,255,0.9); padding: 10px 15px;
-            display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
-        }
-
-        .card-body {
-            max-height: 0; overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 0 10px;
-        }
-
-        .card.expanded .card-body {
-            max-height: 2500px; padding: 0 10px 15px 10px;
-        }
-
-        .info-block { 
-            padding: 12px 14px; border-radius: 8px;
-            background: var(--block-bg);
-            border: 1px solid var(--border-color);
-            margin-top: 10px;
-        }
-
-        .label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; margin-bottom: 5px; display: block; letter-spacing: 0.2px; }
-        .value { font-size: 0.85rem; font-weight: 600; line-height: 1.5; white-space: pre-wrap; }
-        .name-value { font-size: 1.05rem; color: var(--text-main); font-weight: 700; }
-        .conv-value { font-size: 0.75rem; color: var(--text-sub); font-weight: 500; margin-top: 2px; }
-
-        .list-item { display: block; padding: 2px 0; }
-
-        .refresh-btn {
-            position: fixed; bottom: 30px; right: 25px;
-            background: var(--hosp-navy); color: white; border: none;
-            width: 50px; height: 50px; border-radius: 50%;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); font-size: 20px;
-            display: flex; align-items: center; justify-content: center; z-index: 1001;
-            transition: transform 0.2s;
-        }
-        .refresh-btn:active { transform: scale(0.9); }
-
-        /* SKELETON */
-        .skeleton-loader { background-color: var(--skeleton-bg); border-radius: 12px; margin: 16px 0; height: 90px; position: relative; overflow: hidden; }
-        .skeleton-loader::before { content: ''; display: block; position: absolute; left: -150px; top: 0; height: 100%; width: 150px; background: linear-gradient(to right, transparent 0%, var(--skeleton-highlight) 50%, transparent 100%); animation: loading 1.5s infinite; }
-        @keyframes loading { from { left: -150px; } to { left: 100%; } }
-
-        @media print {
-            .sticky-header, .refresh-btn, .voice-btn, .action-btns { display: none !important; }
-            .card-body { max-height: none !important; overflow: visible !important; display: block !important; padding: 10px !important; }
-            .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin: 10px 0 !important; }
-        }
+        .search-field label { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; text-align: center; display: block; }
+        .search-field input { padding: 10px 5px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.85rem; text-align: center; width: 100%; background: var(--card-bg); color: var(--text-main); box-sizing: border-box; }
+        .voice-btn { position: absolute; right: 5px; bottom: 8px; background: none; border: none; cursor: pointer; opacity: 0.4; font-size: 0.8rem; }
+        .filter-controls { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; }
+        #contador { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-small { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .card { background: var(--card-bg); border-radius: 8px; margin: 15px 0; border: 1px solid var(--border-color); overflow: hidden; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card-header { background: var(--hosp-navy); color: white; padding: 10px 15px; display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; }
+        .card-body { display: none; padding: 0 10px 15px 10px; }
+        .card.expanded .card-body { display: block; }
+        .info-block { padding: 12px 15px; border-radius: 4px; background: var(--block-bg); margin-top: 10px; border: 1px solid var(--border-color); }
+        .label { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .value { font-size: 0.9rem; font-weight: 600; line-height: 1.4; white-space: pre-wrap; }
+        .btn-copy { width: 100%; margin-top: 15px; padding: 12px; background: var(--hosp-navy); color: white; border: none; border-radius: 6px; font-weight: 700; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        #modal-cadastro { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--hosp-bg); z-index: 2000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .form-input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-family: inherit; }
+        .fab-container { position: fixed; bottom: 25px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 1001; }
+        .btn-fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        @media print { .sticky-header, .fab-container, .btn-copy, .voice-btn { display: none !important; } .card-body { display: block !important; } .card { break-inside: avoid; border: 1px solid #ccc !important; } }
     </style>
 </head>
-<body>
-
-    <div class="main-container">
-        <div class="sticky-header">
-            <div class="header">
-                <h2>Mapa pacientes AMMUTRO</h2>
-                <div class="header-info">
-                    <span id="status">Sincronizando...</span>
-                    <button id="themeToggle" onclick="toggleTheme()" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
-                </div>
-            </div>
-            
-            <div class="search-grid">
-                <div class="search-field">
-                    <label>Leito</label>
-                    <input type="text" id="searchLeito" placeholder="Nº" onkeyup="filtrarCards()">
-                    <button class="voice-btn" onclick="startVoice('searchLeito')">🎤</button>
-                </div>
-                <div class="search-field">
-                    <label>Paciente</label>
-                    <input type="text" id="searchNome" placeholder="Nome" onkeyup="filtrarCards()">
-                    <button class="voice-btn" onclick="startVoice('searchNome')">🎤</button>
-                </div>
-                <div class="search-field">
-                    <label>NA</label>
-                    <input type="text" id="searchNA" placeholder="ID" onkeyup="filtrarCards()">
-                </div>
-            </div>
-
-            <div class="filter-controls">
-                <span id="contador">Atualizando...</span>
-                <div class="action-btns">
-                    <button class="btn-small" onclick="window.print()">🖨️ PDF</button>
-                    <button class="btn-small" onclick="limparFiltros()">Limpar</button>
-                </div>
-            </div>
+<body class="dark-mode">
+<div class="main-container">
+    <div class="sticky-header">
+        <div class="header">
+            <h2>Mapa pacientes AMMUTRO</h2>
+            <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
         </div>
-
-        <div id="app">
-            <div class="skeleton-loader"></div>
-            <div class="skeleton-loader"></div>
+        <div class="search-grid">
+            <div class="search-field"><label>Leito</label><input type="text" id="sLeito" placeholder="Nº" onkeyup="filtrar()"><button class="voice-btn" onclick="startVoice('sLeito')">🎤</button></div>
+            <div class="search-field"><label>Paciente</label><input type="text" id="sNome" placeholder="Nome" onkeyup="filtrar()"><button class="voice-btn" onclick="startVoice('sNome')">🎤</button></div>
+            <div class="search-field"><label>NA</label><input type="text" id="sNA" placeholder="ID" onkeyup="filtrar()"></div>
+        </div>
+        <div class="filter-controls">
+            <span id="contador">Sincronizando...</span>
+            <div class="action-btns">
+                <button class="btn-small" onclick="window.print()">🖨️ PDF</button>
+                <button class="btn-small" onclick="limpar()">LIMPAR E FECHAR</button>
+            </div>
         </div>
     </div>
+    <div id="app"></div>
+</div>
+<div id="modal-cadastro">
+    <h3 style="margin-bottom:20px;">CADASTRAR PACIENTE</h3>
+    <form id="formPaciente">
+        <input type="text" id="fLeito" class="form-input" placeholder="Leito">
+        <input type="text" id="fNA" class="form-input" placeholder="NA">
+        <input type="text" id="fNome" class="form-input" placeholder="Nome Completo">
+        <input type="text" id="fConvenio" class="form-input" placeholder="Convênio">
+        <textarea id="fHD" class="form-input" placeholder="Diagnóstico (HD)"></textarea>
+        <textarea id="fDieta" class="form-input" placeholder="Dietoterapia"></textarea>
+        <input type="text" id="fEvac" class="form-input" placeholder="Evacuação">
+        <textarea id="fExames" class="form-input" placeholder="Exames"></textarea>
+        <textarea id="fMeds" class="form-input" placeholder="Medicações"></textarea>
+        <textarea id="fNutri" class="form-input" placeholder="Obs Nutrição"></textarea>
+        <textarea id="fNutro" class="form-input" placeholder="Obs Nutrologia"></textarea>
+    </form>
+    <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:15px; background:#0284c7; color:white; font-weight:800; border:none; border-radius:8px; margin-top:10px;">SALVAR NA PLANILHA</button>
+    <button onclick="fechar()" style="width:100%; padding:12px; border:none; color:var(--text-sub); cursor:pointer;">CANCELAR</button>
+</div>
+<div class="fab-container">
+    <button class="btn-fab" style="background:#0284c7" onclick="document.getElementById('modal-cadastro').style.display='block'">+</button>
+    <button class="btn-fab" style="background:var(--hosp-navy)" onclick="buscar()">↻</button>
+</div>
+<script>
+    const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbwwLnUhoUVzwbs3Tdd9cRs3ZF43Nk3v84BYiTKegePdeWwQclZskwQPXInl40x5WhEU/exec'; 
+    let dadosLocais = [];
+    if (localStorage.getItem('ammutro-theme') === 'light') document.body.classList.remove('dark-mode');
 
-    <button class="refresh-btn" onclick="buscarDados()">↻</button>
+    async function buscar() {
+        document.getElementById('contador').innerText = "Sincronizando...";
+        try {
+            const res = await fetch(URL_SCRIPT);
+            dadosLocais = await res.json();
+            render();
+        } catch (e) { document.getElementById('contador').innerText = "Erro."; }
+    }
 
-    <script>
-        const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzRGl7J1UBvc42te3JbkKMTg4QEhPt4UY9f7UuqEIL4Zk9ajUlUufpi2maQV4qJABPv/exec';
-        let dadosLocais = [];
-
-        async function buscarDados() {
-            const statusEl = document.getElementById('status');
-            statusEl.innerText = 'Sincronizando...';
-            try {
-                const res = await fetch(URL_SCRIPT);
-                dadosLocais = await res.json();
-                renderizar(dadosLocais);
-                statusEl.innerText = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            } catch (err) { statusEl.innerText = 'Erro'; }
-        }
-
-        function renderizar(pacientes) {
-            const app = document.getElementById('app');
-            app.innerHTML = pacientes.map(p => `
-                <div class="card" data-leito="${p.leito}" data-nome="${p.nome}" data-na="${p.na}" onclick="this.classList.toggle('expanded')">
-                    <div class="card-header">
-                        <span>LEITO: ${p.leito || '--'}</span>
-                        <span>NA: ${p.na || '--'}</span>
-                    </div>
-                    
-                    <div class="info-block" style="background:var(--card-bg); border:none; margin-bottom:0;">
-                        <div class="value name-value">${p.nome || '-'}</div>
-                        <div class="conv-value">${p.convenio || '-'}</div>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="info-block"><span class="label">Diagnóstico (HD)</span><div class="value">${formatarLista(p.hd)}</div></div>
-                        <div class="info-block"><span class="label">Dietoterapia</span><div class="value">${formatarLista(p.dietoterapia)}</div></div>
-                        <div class="info-block"><span class="label">Evacuação</span><div class="value">${p.evacuacao || '-'}</div></div>
-                        <div class="info-block"><span class="label">Exames</span><div class="value">${formatarLista(p.exames)}</div></div>
-                        <div class="info-block"><span class="label">Medicações</span><div class="value">${formatarLista(p.medicacoes)}</div></div>
-                        <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
-                        <div class="info-block"><span class="label">Obs Nutrologia</span><div class="value">${p.obs_nutro || '-'}</div></div>
-                    </div>
+    function render() {
+        const app = document.getElementById('app');
+        app.innerHTML = dadosLocais.map((p, i) => `
+            <div class="card" data-leito="${p.leito || ''}" data-nome="${p.nome || ''}" data-na="${p.na || ''}" onclick="this.classList.toggle('expanded')">
+                <div class="card-header"><span>LEITO: ${p.leito || '-'}</span><span>NA: ${p.na || '-'}</span></div>
+                <div class="info-block" style="background:transparent; border:none; margin-bottom:0;">
+                    <div style="font-size:1.1rem; font-weight:700;">${p.nome || '-'}</div>
+                    <div style="font-size:0.8rem; color:var(--text-sub)">${p.convenio || '-'}</div>
                 </div>
-            `).join('');
-            filtrarCards();
-        }
+                <div class="card-body">
+                    <div class="info-block"><span class="label">Diagnóstico</span><div class="value">${p.hd || '-'}</div></div>
+                    <div class="info-block"><span class="label">Dieta</span><div class="value">${p.dietoterapia || '-'}</div></div>
+                    <div class="info-block"><span class="label">Evacuação</span><div class="value">${p.evacuacao || '-'}</div></div>
+                    <div class="info-block"><span class="label">Exames</span><div class="value">${p.exames || '-'}</div></div>
+                    <div class="info-block"><span class="label">Medicações</span><div class="value">${p.medicacoes || '-'}</div></div>
+                    <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
+                    <div class="info-block"><span class="label">Obs Nutrologia</span><div class="value">${p.obs_nutro || '-'}</div></div>
+                    <button class="btn-copy" id="btn-cp-${i}" onclick="event.stopPropagation(); copiar(${i})">📋 COPIAR RESUMO</button>
+                </div>
+            </div>`).join('');
+        filtrar();
+    }
 
-        function filtrarCards() {
-            const lB = document.getElementById('searchLeito').value.trim().toLowerCase();
-            const nB = document.getElementById('searchNome').value.trim().toLowerCase();
-            const naB = document.getElementById('searchNA').value.trim().toLowerCase();
-            const cards = document.getElementsByClassName('card');
-            let count = 0;
-            for (let card of cards) {
-                const matchL = lB === "" || card.getAttribute('data-leito').toLowerCase().startsWith(lB);
-                const matchN = nB === "" || card.getAttribute('data-nome').toLowerCase().includes(nB);
-                const matchNA = naB === "" || card.getAttribute('data-na').toLowerCase().includes(naB);
-                if (matchL && matchN && matchNA) { card.style.display = "block"; count++; }
-                else { card.style.display = "none"; }
-            }
-            document.getElementById('contador').innerText = `${count} pacientes encontrados`;
-        }
+    async function salvar() {
+        const btn = document.getElementById('btnSalvar');
+        btn.innerText = "Enviando..."; btn.disabled = true;
+        // Payload respeitando a ordem e nomes corretos
+        const payload = { 
+            leito: document.getElementById('fLeito').value, 
+            na: document.getElementById('fNA').value,
+            nome: document.getElementById('fNome').value, 
+            convenio: document.getElementById('fConvenio').value, 
+            hd: document.getElementById('fHD').value, 
+            dietoterapia: document.getElementById('fDieta').value, 
+            evacuacao: document.getElementById('fEvac').value, 
+            exames: document.getElementById('fExames').value, 
+            medicacoes: document.getElementById('fMeds').value, 
+            obs_nutri: document.getElementById('fNutri').value, 
+            obs_nutro: document.getElementById('fNutro').value 
+        };
+        try {
+            await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("Sucesso!");
+            fechar(); buscar();
+        } catch(e) { alert("Erro."); }
+        btn.innerText = "SALVAR NA PLANILHA"; btn.disabled = false;
+    }
 
-        function limparFiltros() {
-            document.getElementById('searchLeito').value = "";
-            document.getElementById('searchNome').value = "";
-            document.getElementById('searchNA').value = "";
-            filtrarCards();
-        }
+    function copiar(i) {
+        const p = dadosLocais[i];
+        const txt = `*RESUMO PACIENTE - AMMUTRO*\n------------------------------\n*LEITO:* ${p.leito || '-'}\n*NA:* ${p.na || '-'}\n*NOME:* ${p.nome || '-'}\n*CONVÊNIO:* ${p.convenio || '-'}\n------------------------------\n*DIAGNÓSTICO:* ${p.hd || '-'}\n*DIETOTERAPIA:* ${p.dietoterapia || '-'}\n*EVACUAÇÃO:* ${p.evacuacao || '-'}\n*EXAMES:* ${p.exames || '-'}\n*MEDICAÇÕES:* ${p.medicacoes || '-'}\n------------------------------\n*OBS NUTRIÇÃO:* ${p.obs_nutri || '-'}\n*OBS NUTROLOGIA:* ${p.obs_nutro || '-'}`;
+        navigator.clipboard.writeText(txt).then(() => {
+            const btn = document.getElementById(`btn-cp-${i}`);
+            btn.innerText = "✅ COPIADO!";
+            setTimeout(() => { btn.innerText = "📋 COPIAR RESUMO"; }, 2000);
+        });
+    }
 
-        function startVoice(fieldId) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            const btn = event.currentTarget;
-            btn.innerText = "🔴";
-            recognition.onresult = (e) => {
-                let t = e.results[0][0].transcript.toLowerCase();
-                if(fieldId === 'searchLeito') t = t.replace(/\D/g, "");
-                document.getElementById(fieldId).value = t;
-                filtrarCards();
-            };
-            recognition.onend = () => { btn.innerText = "🎤"; };
-            recognition.start();
-        }
+    function fechar() { 
+        document.getElementById('modal-cadastro').style.display='none'; 
+        document.getElementById('formPaciente').reset();
+    }
 
-        function formatarLista(texto) {
-            if (!texto || texto === '-' || texto === '') return '-';
-            const partes = texto.toString().split(/[\n,]+/);
-            return partes.length > 1 ? partes.map(item => `<span class="list-item">• ${item.trim()}</span>`).join('') : texto;
-        }
+    function limpar() {
+        document.getElementById('sLeito').value = ""; document.getElementById('sNome').value = ""; document.getElementById('sNA').value = "";
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('expanded'));
+        filtrar();
+    }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme-ammutro', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-        if (localStorage.getItem('theme-ammutro') === 'dark') document.body.classList.add('dark-mode');
+    function filtrar() {
+        const leitoVal = document.getElementById('sLeito').value.toLowerCase();
+        const nomeVal = document.getElementById('sNome').value.toLowerCase();
+        const naVal = document.getElementById('sNA').value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        let visiveis = 0;
+        cards.forEach(card => {
+            const cLeito = card.getAttribute('data-leito').toLowerCase();
+            const cNome = card.getAttribute('data-nome').toLowerCase();
+            const cNA = card.getAttribute('data-na').toLowerCase();
+            if (cLeito.includes(leitoVal) && cNome.includes(nomeVal) && cNA.includes(naVal)) {
+                card.style.display = "block";
+                visiveis++;
+            } else { card.style.display = "none"; }
+        });
+        document.getElementById('contador').innerText = visiveis + " pacientes encontrados";
+    }
 
-        buscarDados();
-    </script>
+    function startVoice(id) {
+        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        rec.lang = 'pt-BR';
+        rec.onresult = (e) => { 
+            let t = e.results[0][0].transcript.toLowerCase();
+            document.getElementById(id).value = id === 'sLeito' ? t.replace(/\D/g, "") : t;
+            filtrar();
+        };
+        rec.start();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('ammutro-theme', isDark ? 'dark' : 'light');
+    }
+    buscar();
+</script>
 </body>
 </html>
