@@ -33,7 +33,6 @@
 
         .main-container { width: 95%; max-width: 500px; margin: 0 auto; padding-bottom: 90px; }
 
-        /* HEADER E BUSCA */
         .sticky-header {
             position: sticky; top: 0; background: var(--hosp-bg); z-index: 1000;
             padding: 15px 0 10px 0; border-bottom: 2px solid var(--hosp-navy);
@@ -63,7 +62,6 @@
         .action-btns { display: flex; gap: 8px; }
         .btn-small { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer;}
 
-        /* CARDS */
         .card {
             background: var(--card-bg); border-radius: 8px; margin: 20px 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-color);
@@ -157,42 +155,36 @@
 
         function startVoice(fieldId) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (!SpeechRecognition) {
-                alert("Este navegador não suporta reconhecimento de voz ou o site não está em ambiente seguro (HTTPS).");
-                return;
-            }
+            if (!SpeechRecognition) { alert("Navegador sem suporte."); return; }
 
             const recognition = new SpeechRecognition();
             recognition.lang = 'pt-BR';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-
+            
             const btn = event.currentTarget;
             btn.innerText = "🔴";
 
             recognition.onresult = (event) => {
-                let result = event.results[0][0].transcript;
-                let text = result.replace(/\./g, "").trim();
-
+                let result = event.results[0][0].transcript.toLowerCase();
+                
                 if(fieldId === 'searchLeito') {
-                    // Tenta converter "dez" em "10", etc, e remove o que não for número
-                    text = text.replace(/\D/g, "");
+                    // Mapa para converter números falados por extenso
+                    const numerosMap = {
+                        "um": "1", "dois": "2", "três": "3", "quatro": "4", "cinco": "5",
+                        "seis": "6", "sete": "7", "oito": "8", "nove": "9", "dez": "10",
+                        "onze": "11", "doze": "12", "treze": "13", "quatorze": "14", "quinze": "15"
+                    };
+                    
+                    // Se a palavra falada estiver no mapa, substitui. Se não, limpa tudo que não for dígito.
+                    let cleaned = numerosMap[result] || result.replace(/\D/g, "");
+                    document.getElementById(fieldId).value = cleaned;
+                } else {
+                    document.getElementById(fieldId).value = result.replace(".", "");
                 }
-
-                document.getElementById(fieldId).value = text;
+                
                 filtrarCards();
             };
 
-            recognition.onerror = (event) => {
-                console.error("Erro voz:", event.error);
-                if(event.error === 'not-allowed') alert("Permissão de microfone negada. Verifique o cadeado na barra de endereços.");
-            };
-
-            recognition.onend = () => {
-                btn.innerText = "🎤";
-            };
-
+            recognition.onend = () => { btn.innerText = "🎤"; };
             recognition.start();
         }
 
