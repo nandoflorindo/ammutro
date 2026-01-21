@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mapa pacientes AMMUTRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --hosp-navy: #0f172a;
@@ -13,6 +14,8 @@
             --block-bg: #f1f5f9; 
             --text-main: #1e293b;
             --text-sub: #64748b;
+            --skeleton-bg: #e2e8f0;
+            --skeleton-highlight: #f8fafc;
         }
 
         body.dark-mode {
@@ -20,89 +23,111 @@
             --card-bg: #0f172a;
             --border-color: #1e293b;
             --block-bg: #1e293b;
-            --text-main: #f1f5f9;
+            --text-main: #f8fafc;
             --text-sub: #94a3b8;
+            --skeleton-bg: #1e293b;
+            --skeleton-highlight: #0f172a;
         }
         
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--hosp-bg); 
             margin: 0; padding: 0; color: var(--text-main); 
-            transition: all 0.2s ease;
+            transition: background 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .main-container { width: 95%; max-width: 500px; margin: 0 auto; padding-bottom: 90px; }
+        .main-container { width: 92%; max-width: 480px; margin: 0 auto; padding-bottom: 100px; }
 
         .sticky-header {
             position: sticky; top: 0; background: var(--hosp-bg); z-index: 1000;
-            padding: 15px 0 10px 0; border-bottom: 2px solid var(--hosp-navy);
+            padding: 12px 0; border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px; }
-        .header h2 { margin: 0; font-size: 0.95rem; color: var(--hosp-navy); text-transform: uppercase; font-weight: 800; }
-        body.dark-mode .header h2 { color: var(--text-main); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
+        .header h2 { margin: 0; font-size: 0.9rem; color: var(--hosp-navy); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+        body.dark-mode .header h2 { color: #fff; }
 
-        .header-info { display: flex; align-items: center; gap: 10px; }
+        .header-info { display: flex; align-items: center; gap: 12px; }
         #status { font-size: 0.65rem; color: var(--text-sub); font-weight: 600; }
 
-        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 5px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 5px; }
         .search-field { position: relative; }
-        .search-field label { font-size: 0.6rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; text-align: center; display: block;}
+        .search-field label { font-size: 0.55rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; letter-spacing: 0.3px;}
         .search-field input {
-            padding: 10px 5px; border-radius: 4px; border: 1px solid var(--border-color);
-            font-size: 0.85rem; outline: none; text-align: center; width: 100%;
+            padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
+            font-size: 0.8rem; outline: none; text-align: center; width: 100%;
             background: var(--card-bg); color: var(--text-main); box-sizing: border-box;
+            transition: border-color 0.2s;
         }
+        .search-field input:focus { border-color: var(--text-sub); }
 
-        .voice-btn { position: absolute; right: 5px; bottom: 8px; background: none; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0.5; }
+        .voice-btn { position: absolute; right: 5px; bottom: 8px; background: none; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0.4; }
 
-        .filter-controls { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px 0 5px; }
-        #contador { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); }
+        .filter-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px 0 5px; }
+        #contador { font-size: 0.65rem; font-weight: 600; color: var(--text-sub); }
         
-        .action-btns { display: flex; gap: 8px; }
-        .btn-small { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer;}
+        .action-btns { display: flex; gap: 10px; }
+        .btn-small { background: none; border: 1px solid var(--border-color); color: var(--text-sub); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 5px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .btn-small:hover { background: var(--block-bg); }
 
+        /* CARDS REFINADOS */
         .card {
-            background: var(--card-bg); border-radius: 8px; margin: 20px 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-color);
-            overflow: hidden;
+            background: var(--card-bg); border-radius: 12px; margin: 16px 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            overflow: hidden; cursor: pointer;
         }
 
         .card-header {
-            background: var(--hosp-navy); color: white; padding: 8px 15px;
-            display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold;
+            background: var(--hosp-navy); color: rgba(255,255,255,0.9); padding: 10px 15px;
+            display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 10px;
+        }
+
+        .card.expanded .card-body {
+            max-height: 2500px; padding: 0 10px 15px 10px;
         }
 
         .info-block { 
-            padding: 12px 15px; margin: 8px; border-radius: 4px;
-            background: var(--block-bg); border: 1px solid var(--border-color);
+            padding: 12px 14px; border-radius: 8px;
+            background: var(--block-bg);
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
         }
 
-        .label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-sub); font-weight: 800; margin-bottom: 4px; display: block; }
-        .value { font-size: 0.92rem; font-weight: 600; line-height: 1.4; white-space: pre-wrap; }
-        .name-value { font-size: 1.1rem; color: var(--text-main); margin-bottom: 2px; }
-        .conv-value { font-size: 0.8rem; color: var(--text-sub); font-weight: 700; }
+        .label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; margin-bottom: 5px; display: block; letter-spacing: 0.2px; }
+        .value { font-size: 0.85rem; font-weight: 600; line-height: 1.5; white-space: pre-wrap; }
+        .name-value { font-size: 1.05rem; color: var(--text-main); font-weight: 700; }
+        .conv-value { font-size: 0.75rem; color: var(--text-sub); font-weight: 500; margin-top: 2px; }
 
-        .list-item { display: block; padding: 3px 0; border-bottom: 1px solid var(--border-color); }
-        .list-item:last-child { border-bottom: none; }
+        .list-item { display: block; padding: 2px 0; }
 
         .refresh-btn {
-            position: fixed; bottom: 25px; right: 25px;
+            position: fixed; bottom: 30px; right: 25px;
             background: var(--hosp-navy); color: white; border: none;
-            width: 55px; height: 55px; border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;
+            width: 50px; height: 50px; border-radius: 50%;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); font-size: 20px;
             display: flex; align-items: center; justify-content: center; z-index: 1001;
+            transition: transform 0.2s;
         }
+        .refresh-btn:active { transform: scale(0.9); }
+
+        /* SKELETON */
+        .skeleton-loader { background-color: var(--skeleton-bg); border-radius: 12px; margin: 16px 0; height: 90px; position: relative; overflow: hidden; }
+        .skeleton-loader::before { content: ''; display: block; position: absolute; left: -150px; top: 0; height: 100%; width: 150px; background: linear-gradient(to right, transparent 0%, var(--skeleton-highlight) 50%, transparent 100%); animation: loading 1.5s infinite; }
+        @keyframes loading { from { left: -150px; } to { left: 100%; } }
 
         @media print {
-            body { background: white !important; color: black !important; }
-            .sticky-header, .refresh-btn, #themeToggle, .action-btns, .voice-btn { display: none !important; }
-            .main-container { width: 100%; max-width: 100%; margin: 0; padding: 0; }
+            .sticky-header, .refresh-btn, .voice-btn, .action-btns { display: none !important; }
+            .card-body { max-height: none !important; overflow: visible !important; display: block !important; padding: 10px !important; }
             .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin: 10px 0 !important; }
-            .card-header { background: #eee !important; color: black !important; border-bottom: 1px solid #ccc !important; }
-            .info-block { background: #fafafa !important; border: 1px solid #eee !important; margin: 5px !important; padding: 8px !important; }
-            .name-value { color: black !important; }
-            .conv-value { color: #555 !important; }
         }
     </style>
 </head>
@@ -144,7 +169,10 @@
             </div>
         </div>
 
-        <div id="app"></div>
+        <div id="app">
+            <div class="skeleton-loader"></div>
+            <div class="skeleton-loader"></div>
+        </div>
     </div>
 
     <button class="refresh-btn" onclick="buscarDados()">↻</button>
@@ -153,60 +181,6 @@
         const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzRGl7J1UBvc42te3JbkKMTg4QEhPt4UY9f7UuqEIL4Zk9ajUlUufpi2maQV4qJABPv/exec';
         let dadosLocais = [];
 
-        function startVoice(fieldId) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { alert("Navegador sem suporte."); return; }
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            
-            const btn = event.currentTarget;
-            btn.innerText = "🔴";
-
-            recognition.onresult = (event) => {
-                let result = event.results[0][0].transcript.toLowerCase();
-                
-                if(fieldId === 'searchLeito') {
-                    // Mapa para converter números falados por extenso
-                    const numerosMap = {
-                        "um": "1", "dois": "2", "três": "3", "quatro": "4", "cinco": "5",
-                        "seis": "6", "sete": "7", "oito": "8", "nove": "9", "dez": "10",
-                        "onze": "11", "doze": "12", "treze": "13", "quatorze": "14", "quinze": "15"
-                    };
-                    
-                    // Se a palavra falada estiver no mapa, substitui. Se não, limpa tudo que não for dígito.
-                    let cleaned = numerosMap[result] || result.replace(/\D/g, "");
-                    document.getElementById(fieldId).value = cleaned;
-                } else {
-                    document.getElementById(fieldId).value = result.replace(".", "");
-                }
-                
-                filtrarCards();
-            };
-
-            recognition.onend = () => { btn.innerText = "🎤"; };
-            recognition.start();
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme-ammutro', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-        if (localStorage.getItem('theme-ammutro') === 'dark') document.body.classList.add('dark-mode');
-
-        function limparFiltros() {
-            document.getElementById('searchLeito').value = "";
-            document.getElementById('searchNome').value = "";
-            document.getElementById('searchNA').value = "";
-            filtrarCards();
-        }
-
-        function formatarLista(texto) {
-            if (!texto || texto === '-' || texto === '') return '-';
-            const partes = texto.toString().split(/[\n,]+/);
-            return partes.length > 1 ? partes.map(item => `<span class="list-item">• ${item.trim()}</span>`).join('') : texto;
-        }
-
         async function buscarDados() {
             const statusEl = document.getElementById('status');
             statusEl.innerText = 'Sincronizando...';
@@ -214,8 +188,36 @@
                 const res = await fetch(URL_SCRIPT);
                 dadosLocais = await res.json();
                 renderizar(dadosLocais);
-                statusEl.innerText = 'Última atualização: ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            } catch (err) { statusEl.innerText = 'Erro de conexão'; }
+                statusEl.innerText = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            } catch (err) { statusEl.innerText = 'Erro'; }
+        }
+
+        function renderizar(pacientes) {
+            const app = document.getElementById('app');
+            app.innerHTML = pacientes.map(p => `
+                <div class="card" data-leito="${p.leito}" data-nome="${p.nome}" data-na="${p.na}" onclick="this.classList.toggle('expanded')">
+                    <div class="card-header">
+                        <span>LEITO: ${p.leito || '--'}</span>
+                        <span>NA: ${p.na || '--'}</span>
+                    </div>
+                    
+                    <div class="info-block" style="background:var(--card-bg); border:none; margin-bottom:0;">
+                        <div class="value name-value">${p.nome || '-'}</div>
+                        <div class="conv-value">${p.convenio || '-'}</div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-block"><span class="label">Diagnóstico (HD)</span><div class="value">${formatarLista(p.hd)}</div></div>
+                        <div class="info-block"><span class="label">Dietoterapia</span><div class="value">${formatarLista(p.dietoterapia)}</div></div>
+                        <div class="info-block"><span class="label">Evacuação</span><div class="value">${p.evacuacao || '-'}</div></div>
+                        <div class="info-block"><span class="label">Exames</span><div class="value">${formatarLista(p.exames)}</div></div>
+                        <div class="info-block"><span class="label">Medicações</span><div class="value">${formatarLista(p.medicacoes)}</div></div>
+                        <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
+                        <div class="info-block"><span class="label">Obs Nutrologia</span><div class="value">${p.obs_nutro || '-'}</div></div>
+                    </div>
+                </div>
+            `).join('');
+            filtrarCards();
         }
 
         function filtrarCards() {
@@ -234,34 +236,43 @@
             document.getElementById('contador').innerText = `${count} pacientes encontrados`;
         }
 
-        function renderizar(pacientes) {
-            const app = document.getElementById('app');
-            app.innerHTML = pacientes.map(p => `
-                <div class="card" data-leito="${p.leito}" data-nome="${p.nome}" data-na="${p.na}">
-                    <div class="card-header">
-                        <span>LEITO: ${p.leito || '--'}</span>
-                        <span>NA: ${p.na || '--'}</span>
-                    </div>
-                    
-                    <div class="info-block" style="background:var(--card-bg)">
-                        <div class="value name-value">Nome: ${p.nome || '-'}</div>
-                        <div class="conv-value">Convênio: ${p.convenio || '-'}</div>
-                    </div>
-
-                    <div class="info-block"><span class="label">Diagnóstico (HD)</span><div class="value">${formatarLista(p.hd)}</div></div>
-                    <div class="info-block"><span class="label">Dietoterapia</span><div class="value">${formatarLista(p.dietoterapia)}</div></div>
-                    <div class="info-block"><span class="label">Evacuação</span><div class="value">${p.evacuacao || '-'}</div></div>
-                    <div class="info-block"><span class="label">Exames</span><div class="value">${formatarLista(p.exames)}</div></div>
-                    <div class="info-block"><span class="label">Medicações</span><div class="value">${formatarLista(p.medicacoes)}</div></div>
-                    <div class="info-block"><span class="label">Obs Nutrição</span><div class="value">${p.obs_nutri || '-'}</div></div>
-                    <div class="info-block"><span class="label">Obs Nutrologia</span><div class="value">${p.obs_nutro || '-'}</div></div>
-                </div>
-            `).join('');
+        function limparFiltros() {
+            document.getElementById('searchLeito').value = "";
+            document.getElementById('searchNome').value = "";
+            document.getElementById('searchNA').value = "";
             filtrarCards();
         }
 
+        function startVoice(fieldId) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            const btn = event.currentTarget;
+            btn.innerText = "🔴";
+            recognition.onresult = (e) => {
+                let t = e.results[0][0].transcript.toLowerCase();
+                if(fieldId === 'searchLeito') t = t.replace(/\D/g, "");
+                document.getElementById(fieldId).value = t;
+                filtrarCards();
+            };
+            recognition.onend = () => { btn.innerText = "🎤"; };
+            recognition.start();
+        }
+
+        function formatarLista(texto) {
+            if (!texto || texto === '-' || texto === '') return '-';
+            const partes = texto.toString().split(/[\n,]+/);
+            return partes.length > 1 ? partes.map(item => `<span class="list-item">• ${item.trim()}</span>`).join('') : texto;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme-ammutro', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('theme-ammutro') === 'dark') document.body.classList.add('dark-mode');
+
         buscarDados();
-        setInterval(buscarDados, 60000);
     </script>
 </body>
 </html>
