@@ -31,7 +31,7 @@
         .action-btns { display: flex; gap: 8px; }
         .btn-small { background: none; border: 1px solid var(--text-sub); color: var(--text-sub); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
         .card { background: var(--card-bg); border-radius: 8px; margin: 15px 0; border: 1px solid var(--border-color); overflow: hidden; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .card-header { background: var(--hosp-navy); color: white; padding: 10px 15px; display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; }
+        .card-header { background: var(--hosp-navy); color: white; padding: 10px 15px; display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; align-items: center; }
         .card-body { display: none; padding: 0 10px 15px 10px; }
         .card.expanded .card-body { display: block; }
         .info-block { padding: 12px 15px; border-radius: 4px; background: var(--block-bg); margin-top: 10px; border: 1px solid var(--border-color); }
@@ -42,7 +42,20 @@
         .form-input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-family: inherit; }
         .fab-container { position: fixed; bottom: 25px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 1001; }
         .btn-fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        @media print { .sticky-header, .fab-container, .btn-copy, .voice-btn { display: none !important; } .card-body { display: block !important; } .card { break-inside: avoid; border: 1px solid #ccc !important; } }
+        .btn-del { background: none; border: none; color: #f87171; font-size: 1rem; cursor: pointer; padding: 5px; }
+
+        /* REGRAS EXCLUSIVAS PARA O PDF/IMPRESSÃO */
+        @media print {
+            body { background-color: white !important; color: black !important; }
+            .sticky-header, .fab-container, .btn-copy, .voice-btn, .btn-del, .action-btns, #contador { display: none !important; }
+            .main-container { width: 100%; max-width: none; margin: 0; padding: 0; }
+            .card { border: 1px solid #000 !important; box-shadow: none !important; margin: 10px 0 !important; page-break-inside: avoid; }
+            .card-header { background: #eee !important; color: #000 !important; border-bottom: 1px solid #000 !important; }
+            .card-body { display: block !important; padding: 5px 10px !important; }
+            .info-block { background: #fff !important; border: 1px solid #ddd !important; margin-top: 5px !important; padding: 8px !important; }
+            .label { color: #555 !important; }
+            .value { color: #000 !important; font-size: 0.85rem !important; }
+        }
     </style>
 </head>
 <body class="dark-mode">
@@ -50,7 +63,7 @@
     <div class="sticky-header">
         <div class="header">
             <h2>Mapa pacientes AMMUTRO</h2>
-            <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
+            <button onclick="toggleTheme()" id="themeBtn" style="background:none; border:none; font-size:1.1rem; cursor:pointer;">🌓</button>
         </div>
         <div class="search-grid">
             <div class="search-field"><label>Leito</label><input type="text" id="sLeito" placeholder="Nº" onkeyup="filtrar()"><button class="voice-btn" onclick="startVoice('sLeito')">🎤</button></div>
@@ -67,6 +80,7 @@
     </div>
     <div id="app"></div>
 </div>
+
 <div id="modal-cadastro">
     <h3 style="margin-bottom:20px;">CADASTRAR PACIENTE</h3>
     <form id="formPaciente">
@@ -85,13 +99,16 @@
     <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:15px; background:#0284c7; color:white; font-weight:800; border:none; border-radius:8px; margin-top:10px;">SALVAR NA PLANILHA</button>
     <button onclick="fechar()" style="width:100%; padding:12px; border:none; color:var(--text-sub); cursor:pointer;">CANCELAR</button>
 </div>
+
 <div class="fab-container">
     <button class="btn-fab" style="background:#0284c7" onclick="document.getElementById('modal-cadastro').style.display='block'">+</button>
     <button class="btn-fab" style="background:var(--hosp-navy)" onclick="buscar()">↻</button>
 </div>
+
 <script>
-    const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbwwLnUhoUVzwbs3Tdd9cRs3ZF43Nk3v84BYiTKegePdeWwQclZskwQPXInl40x5WhEU/exec'; 
+    const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzqnJaLOaDDm8gJ4WgcoEQUte1JYFWNt3NcowWie8_9hzP9_iTqRjG7bz87rvIuug5w/exec'; 
     let dadosLocais = [];
+
     if (localStorage.getItem('ammutro-theme') === 'light') document.body.classList.remove('dark-mode');
 
     async function buscar() {
@@ -107,7 +124,10 @@
         const app = document.getElementById('app');
         app.innerHTML = dadosLocais.map((p, i) => `
             <div class="card" data-leito="${p.leito || ''}" data-nome="${p.nome || ''}" data-na="${p.na || ''}" onclick="this.classList.toggle('expanded')">
-                <div class="card-header"><span>LEITO: ${p.leito || '-'}</span><span>NA: ${p.na || '-'}</span></div>
+                <div class="card-header">
+                    <span>LEITO: ${p.leito || '-'} | NA: ${p.na || '-'}</span>
+                    <button class="btn-del" onclick="event.stopPropagation(); excluir(${p.row_index}, '${p.nome}')">🗑️</button>
+                </div>
                 <div class="info-block" style="background:transparent; border:none; margin-bottom:0;">
                     <div style="font-size:1.1rem; font-weight:700;">${p.nome || '-'}</div>
                     <div style="font-size:0.8rem; color:var(--text-sub)">${p.convenio || '-'}</div>
@@ -126,28 +146,26 @@
         filtrar();
     }
 
+    async function excluir(rowIndex, nome) {
+        if (confirm(`Deseja realmente apagar o paciente ${nome}?\nEsta ação não pode ser desfeita.`)) {
+            document.getElementById('contador').innerText = "Excluindo...";
+            try {
+                await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', row_index: rowIndex }) });
+                alert("Paciente removido!");
+                buscar();
+            } catch(e) { alert("Erro ao excluir."); }
+        }
+    }
+
     async function salvar() {
         const btn = document.getElementById('btnSalvar');
         btn.innerText = "Enviando..."; btn.disabled = true;
-        // Payload respeitando a ordem e nomes corretos
-        const payload = { 
-            leito: document.getElementById('fLeito').value, 
-            na: document.getElementById('fNA').value,
-            nome: document.getElementById('fNome').value, 
-            convenio: document.getElementById('fConvenio').value, 
-            hd: document.getElementById('fHD').value, 
-            dietoterapia: document.getElementById('fDieta').value, 
-            evacuacao: document.getElementById('fEvac').value, 
-            exames: document.getElementById('fExames').value, 
-            medicacoes: document.getElementById('fMeds').value, 
-            obs_nutri: document.getElementById('fNutri').value, 
-            obs_nutro: document.getElementById('fNutro').value 
-        };
+        const payload = { leito: document.getElementById('fLeito').value, na: document.getElementById('fNA').value, nome: document.getElementById('fNome').value, convenio: document.getElementById('fConvenio').value, hd: document.getElementById('fHD').value, dietoterapia: document.getElementById('fDieta').value, evacuacao: document.getElementById('fEvac').value, exames: document.getElementById('fExames').value, medicacoes: document.getElementById('fMeds').value, obs_nutri: document.getElementById('fNutri').value, obs_nutro: document.getElementById('fNutro').value };
         try {
             await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             alert("Sucesso!");
             fechar(); buscar();
-        } catch(e) { alert("Erro."); }
+        } catch(e) { alert("Erro ao salvar."); }
         btn.innerText = "SALVAR NA PLANILHA"; btn.disabled = false;
     }
 
