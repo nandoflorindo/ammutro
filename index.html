@@ -42,11 +42,10 @@
         .form-input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-family: inherit; }
         .fab-container { position: fixed; bottom: 25px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 1001; }
         .btn-fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        .btn-del { background: none; border: none; color: #f87171; font-size: 1rem; cursor: pointer; padding: 5px; }
 
         @media print {
             body { background-color: white !important; color: black !important; }
-            .sticky-header, .fab-container, .btn-copy, .voice-btn, .btn-del, .action-btns, #contador { display: none !important; }
+            .sticky-header, .fab-container, .btn-copy, .voice-btn, .action-btns, #contador { display: none !important; }
             .main-container { width: 100%; max-width: none; margin: 0; padding: 0; }
             .card { border: 1px solid #000 !important; box-shadow: none !important; margin: 10px 0 !important; page-break-inside: avoid; }
             .card-header { background: #f0f0f0 !important; color: #000 !important; border-bottom: 1px solid #000 !important; }
@@ -135,7 +134,6 @@
             <div class="card" data-leito="${p.leito || ''}" data-nome="${p.nome || ''}" data-na="${p.na || ''}" onclick="this.classList.toggle('expanded')">
                 <div class="card-header">
                     <span>LEITO: ${p.leito || '-'} | NA: ${p.na || '-'}</span>
-                    <button class="btn-del" onclick="event.stopPropagation(); excluir(${p.row_index}, '${p.nome}')">🗑️</button>
                 </div>
                 <div class="info-block" style="background:transparent; border:none; margin-bottom:0;">
                     <div style="font-size:1.1rem; font-weight:700;">${p.nome || '-'}</div>
@@ -153,17 +151,6 @@
                 </div>
             </div>`).join('');
         filtrar();
-    }
-
-    async function excluir(rowIndex, nome) {
-        if (confirm(`Deseja realmente apagar o paciente ${nome}?\nEsta ação não pode ser desfeita.`)) {
-            document.getElementById('contador').innerText = "Excluindo...";
-            try {
-                await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', row_index: rowIndex }) });
-                alert("Paciente removido!");
-                buscar();
-            } catch(e) { alert("Erro ao excluir."); }
-        }
     }
 
     async function salvar() {
